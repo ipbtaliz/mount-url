@@ -79,6 +79,7 @@ module.exports = function (href, cb) {
         } catch (e) {
             // Do something with the error ... or not ...
         }
+      }
       req.abort()
       cb(null, res.statusCode, res.headers)
     })
