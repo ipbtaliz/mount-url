@@ -74,13 +74,9 @@ module.exports = function (href, cb) {
       if (res.statusCode === 200) {
         try {
           var contentDisposition = res.headers['content-disposition'];
-          console.log(contentDisposition)
           var match = contentDisposition && contentDisposition.match(/(filename=|filename\*='')(.*)$/);
-          console.log(match)
-          match = match && match.match(/(["])((\\\1|.)*?)\1/);
-          console.log(match)
-          match = match && match.replace(/["]/g, "")
-          console.log(match)
+          match = match && match[2].match(/(["])((\\\1|.)*?)\1/g);
+          match = match && match[0].replace(/["]/g, "")
           filename = match || filename;
         } catch (e) {
             // Do something with the error ... or not ...
