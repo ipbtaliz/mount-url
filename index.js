@@ -11,7 +11,10 @@ var debug = require('debug')('mount-url')
 var ENOENT = -2
 var EPERM = -1
 
-module.exports = function (href, cb) {
+module.exports = function (argv, cb) {
+  var href = argv._[0]
+  var symlp = argv._[1] || process.cwd()
+  if (!fs.lstatSync(symlp).isDirectory()) return cb (new Error('Invalid symlink path'))
   var parsed = url.parse(href)
   var filename = path.basename(parsed.pathname)
   var handlers = {}
@@ -45,7 +48,7 @@ module.exports = function (href, cb) {
             })
             return
           }
-          fs.symlink(path.join(mnt, filename), path.join(process.cwd(), filename), function (err) {
+          fs.symlink(path.join(mnt, filename), path.join(symlp, filename), function (err) {
             if (err) {
               cleanup(function () {
                 cb(new Error('Symlink error: ' + err.message))
@@ -60,7 +63,7 @@ module.exports = function (href, cb) {
   })
 
   function cleanup (cb) {
-    fs.unlink(path.join(process.cwd(), filename), function (err) {
+    fs.unlink(path.join(symlp, filename), function (err) {
       fuse.unmount(mnt, function () {
         if (cb) cb()
       })
@@ -68,7 +71,14 @@ module.exports = function (href, cb) {
   }
 
   function requestHeaders (href, cb) {
-    var req = request.get(href)
+    var auth = argv && argv.auth && argv.auth.split(":")
+    var req
+    if (auth && auth[0] && auth[1]) {
+      req = request.get(href).auth(auth[0],auth[1])
+    }
+    else {
+      req = request.get(href)
+    }
 
     req.on('response', function (res) {
       if (res.statusCode === 200) {
