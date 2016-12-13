@@ -75,6 +75,7 @@ module.exports = function (href, cb) {
         try {
           var contentDisposition = res.headers['content-disposition'];
           var match = contentDisposition && contentDisposition.match(/(["])((\\\1|.)*?)\1/);
+          match = match && match.replace(/["']/g, "")
           filename = match || filename;
         } catch (e) {
             // Do something with the error ... or not ...
