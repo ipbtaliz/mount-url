@@ -71,6 +71,14 @@ module.exports = function (href, cb) {
     var req = request.get(href)
 
     req.on('response', function (res) {
+      if (res.statusCode === 200) {
+        try {
+          var contentDisposition = res.headers['content-disposition'];
+          var match = contentDisposition && contentDisposition.match(/(filename=|filename\*='')(.*)$/);
+          filename = match && match[2] || filename;
+        } catch (e) {
+            // Do something with the error ... or not ...
+        }
       req.abort()
       cb(null, res.statusCode, res.headers)
     })
