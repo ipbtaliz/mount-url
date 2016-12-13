@@ -3,7 +3,7 @@ var mounturl = require('./index.js')
 var argv = require('minimist')(process.argv.slice(2));
 
 if (argv._.length == 0) {
-  console.error('Usage: mount-url <url> [mount-point] [options]')
+  console.error('Usage: mount-url <url> [symlink-path] [options]')
   process.exit(1)
 }
 
